@@ -29,9 +29,9 @@ public class DreamTeam {
             team.members.add(new Pokemon(Type.WATER, Type.FLYING));
             team.members.add(new Pokemon(Type.ELECTRIC));
             team.members.add(new Pokemon(Type.FIGHTING, Type.STEEL));
-            team.members.add(new Pokemon(Type.FIRE));
-            team.members.add(new Pokemon(Type.GHOST, Type.FLYING));
-            team.members.add(new Pokemon(Type.ICE, Type.GHOST));
+            team.members.add(new Pokemon(Type.GROUND, Type.POISON));
+            team.members.add(new Pokemon(Type.GRASS, Type.FLYING));
+            team.members.add(new Pokemon(Type.ICE, Type.DARK));
             
             team.analize();
             team.analizeOutcome();
@@ -209,10 +209,12 @@ public class DreamTeam {
             this.analizeScore();
 
             int bestScore = this.score;
-            for (int i = 0; i < members.size(); ++i) {
-                this.optimizeMember(i);
+            int n = members.size();
+            int r = (int)(Math.random() * n+1);
+            for (int i = r; i < n + r; ++i) {
+                this.optimizeMember(i % n);
                 if (this.score > bestScore) {
-                    i = -1;
+                    i = r;
                     bestScore = this.score;
                 }
             }
