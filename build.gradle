@@ -1,0 +1,25 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "DreamTeam"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-simple:1.6.1'
+    compile 'commons-configuration:commons-configuration:1.7'
+    compile 'com.google.guava:guava:14.0.1'
+}
+
+sourceSets {
+    main {
+        java.srcDir 'src'
+    }
+}
+
+tasks.withType(Compile) { 
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Xlint:deprecation" 
+} 
