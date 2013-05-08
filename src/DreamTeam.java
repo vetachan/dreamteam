@@ -26,15 +26,16 @@ public class DreamTeam {
             parseTypes();
 
             Team team = new Team();
-            team.members.add(new Pokemon(Type.WATER, Type.FLYING));
-            team.members.add(new Pokemon(Type.ELECTRIC));
-            team.members.add(new Pokemon(Type.FIGHTING, Type.STEEL));
-            team.members.add(new Pokemon(Type.GROUND, Type.POISON));
-            team.members.add(new Pokemon(Type.GRASS, Type.FLYING));
-            team.members.add(new Pokemon(Type.ICE, Type.DARK));
+            team.add(1, new Pokemon(Type.WATER, Type.FLYING));
+            team.add(2, new Pokemon(Type.ICE));
+            team.add(3, new Pokemon(Type.DARK, Type.GRASS));
+            team.add(4, new Pokemon(Type.GROUND, Type.POISON));
+            team.add(5, new Pokemon(Type.FIGHTING, Type.FIRE));
+            team.add(6, new Pokemon(Type.GRASS));
             
-            team.analize();
-            team.analizeOutcome();
+            //team.generateTeams();
+            //team.analize();
+            //team.analizeOutcome();
             team.optimize();
                   
         } catch (ConfigurationException ce) {
@@ -83,11 +84,15 @@ public class DreamTeam {
         }
 
         public void add(int position, Pokemon pokemon) {
-            members.add(position, pokemon);
+            members.add(position - 1, pokemon);
         }
 
         public void remove(int position) {
-            members.remove(position);
+            members.remove(position - 1);
+        }
+
+        public Pokemon getMember(int position) {
+            return members.get(position - 1);
         }
 
         public void analize() {           
@@ -138,32 +143,34 @@ public class DreamTeam {
             System.out.println("Score: " + score + " out of 347");         
         }
 
-        public static void generateTeams() {
+        // TODO Generate random first state and optimize
+        // WARN Do not try to execute this without at least two fixed members!
+        public void generateTeams() {
             Team team;
             Team bestTeam = null;
             List<Team> topTeams = new ArrayList<Team>();
             int n = pokemons.size();
+            int nTeam = this.members.size();
             Pokemon member1, member2, member3, member4, member5, member6;
 
-            // TODO Generate random first state and optimize
-            // TODO Do not try to execute this without at least two fixed members!
-                member1 = new Pokemon(Type.ELECTRIC);
-                member2 = new Pokemon(Type.DARK, Type.ICE);
+            for (int i1 = 0; i1 < n; ++i1) {
+                member1 = nTeam > 0 ? this.getMember(1) : pokemons.get(i1);
+                if (isInBlacklist(member1)) continue;
 
-                /*for (int i2 = 0; i2 < n; ++i2) {
-                    member2 = pokemons.get(i2);
+                for (int i2 = i1+1; i2 < n; ++i2) {  
+                    member2 = nTeam > 1 ? this.getMember(2) : pokemons.get(i2);   
                     if (isInBlacklist(member2)) continue;
-*/
-                    for (int i3 = 0; i3 < n; ++i3) {
-                        member3 = pokemons.get(i3);
+
+                    for (int i3 = i2+1; i3 < n; ++i3) {
+                        member3 = nTeam > 2 ? this.getMember(3) : pokemons.get(i3);         
                         if (isInBlacklist(member3)) continue;
 
                         for (int i4 = i3+1; i4 < n; ++i4) {
-                            member4 = pokemons.get(i4);
+                            member4 = nTeam > 3 ? this.getMember(4) : pokemons.get(i4);  
                             if (isInBlacklist(member4)) continue;
 
                             for (int i5 = i4+1; i5 < n; ++i5) {
-                                member5 = pokemons.get(i5);
+                                member5 = nTeam > 4 ? this.getMember(5) : pokemons.get(i5); 
                                 if (isInBlacklist(member5)) continue;
 
                                 for (int i6 = i5+1; i6 < n; ++i6) {
@@ -171,12 +178,12 @@ public class DreamTeam {
                                     if (isInBlacklist(member6)) continue;
 
                                     team = new Team();
-                                    team.members.add(member1);
-                                    team.members.add(member2);
-                                    team.members.add(member3);
-                                    team.members.add(member4);
-                                    team.members.add(member5);
-                                    team.members.add(member6);
+                                    team.add(1, member1);
+                                    team.add(2, member2);
+                                    team.add(3, member3);
+                                    team.add(4, member4);
+                                    team.add(5, member5);
+                                    team.add(6, member6);
 
                                     team.analize();
                                     team.analizeScore();
@@ -192,10 +199,16 @@ public class DreamTeam {
                                         topTeams.add(new Team(team));
                                     }
                                 }
+                                if (nTeam > 4) i5 = n;
                             }
+                            if (nTeam > 3) i4 = n;
                         }
+                        if (nTeam > 2) i3 = n;
                     }
-              //  } 
+                    if (nTeam > 1) i2 = n;
+                }
+                if (nTeam > 0) i1 = n;
+            }
                   
             for (Team topTeam : topTeams) {
                 System.out.println(topTeam);
@@ -212,7 +225,7 @@ public class DreamTeam {
             int n = members.size();
             int r = (int)(Math.random() * n+1);
             for (int i = r; i < n + r; ++i) {
-                this.optimizeMember(i % n);
+                this.optimizeMember(i % n + 1);
                 if (this.score > bestScore) {
                     i = r;
                     bestScore = this.score;
@@ -222,20 +235,29 @@ public class DreamTeam {
         }
 
         public void optimizeMember(int i) {
-            System.out.println("Optimizing "  + i);
+            System.out.println("Optimizing member "  + i);
+            List<Team> topTeams = new ArrayList<Team>();
             Team bestTeam = new Team(this);
             Team team = new Team(this);
 
             for (Pokemon poke : pokemons) {
+                if (isInBlacklist(poke)) continue;
                 team.clearResults();
                 team.remove(i);
                 team.add(i, poke);
                 team.analize();
                 team.analizeScore();
                 if (team.score > bestTeam.score) {                                        
-                    System.out.println(team);
                     bestTeam = new Team(team);
+                    topTeams.clear();
+                    topTeams.add(new Team(team));
+                } else if (team.score == bestTeam.score) {
+                    topTeams.add(new Team(team));
                 }
+            }
+
+            for (Team topTeam : topTeams) {
+                System.out.println(topTeam);
             }
             this.copy(bestTeam);
         }
@@ -243,7 +265,7 @@ public class DreamTeam {
         public static boolean isInBlacklist(Pokemon poke) {
             // TODO Read from file
             if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.DRAGON)) return true;
-            //if (poke.type1.equals(Type.FLYING) && poke.type2.equals(Type.WATER)) return true;
+            if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.GROUND)) return true;
             return false;
         }
 
