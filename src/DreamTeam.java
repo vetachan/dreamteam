@@ -26,17 +26,19 @@ public class DreamTeam {
             parseTypes();
 
             Team team = new Team();
-            team.add(1, new Pokemon(Type.WATER, Type.FLYING));
-            team.add(2, new Pokemon(Type.ICE));
-            team.add(3, new Pokemon(Type.DARK, Type.GRASS));
-            team.add(4, new Pokemon(Type.GROUND, Type.POISON));
-            team.add(5, new Pokemon(Type.FIGHTING, Type.FIRE));
-            team.add(6, new Pokemon(Type.GRASS));
+            team.add(1, new Pokemon(Type.POISON, Type.GROUND));
+            team.add(2, new Pokemon(Type.DARK, Type.ICE));
+            //team.add(3, new Pokemon(Type.FIRE));
+            //team.add(4, new Pokemon(Type.FIGHTING, Type.WATER));
+            //team.add(5, new Pokemon(Type.DRAGON, Type.GROUND));
+            //team.add(6, new Pokemon(Type.ELECTRIC));
             
-            //team.generateTeams();
             //team.analize();
             //team.analizeOutcome();
-            team.optimize();
+            
+            team.generateTeams();
+
+            //team.optimize();
                   
         } catch (ConfigurationException ce) {
             System.err.println("Could not open a configuration file");
@@ -73,6 +75,14 @@ public class DreamTeam {
             for (Type key : team.results.keySet()) {
                 this.results.put(key, new HashMap<Type,Outcome>(team.results.get(key)));
             }  
+        }
+
+        public boolean equals(Team team) {
+            if (this.members.size() != team.members.size()) return false;
+            for (int i = 0; i < this.members.size(); ++i) {
+                if (!this.members.get(i).equals(team.members.get(i))) return false;
+            }
+            return true;
         }
 
         public void clearResults() {
@@ -124,10 +134,10 @@ public class DreamTeam {
                             System.out.println("ALERT!!! Weakness against " + types);
                             break;
                         case EVEN:
-                            System.out.println("Even against " + types);
+                            System.out.println("Oops! Even against " + types);
                             break;
                         case FAIR:
-                            System.out.println("Fair against " + types); 
+                            System.out.println("Uhmm... Fair against " + types); 
                             break;
                         case GOOD:                            
                             System.out.println("Easy as a pie with " + types);
@@ -227,7 +237,7 @@ public class DreamTeam {
             for (int i = r; i < n + r; ++i) {
                 this.optimizeMember(i % n + 1);
                 if (this.score > bestScore) {
-                    i = r;
+                    i = r-1;
                     bestScore = this.score;
                 }
             }
@@ -255,11 +265,16 @@ public class DreamTeam {
                     topTeams.add(new Team(team));
                 }
             }
-
+   
             for (Team topTeam : topTeams) {
-                System.out.println(topTeam);
+                if (!this.equals(topTeam)) {
+                    System.out.println(topTeam);
+                }
             }
-            this.copy(bestTeam);
+
+            if (!this.equals(bestTeam)) {
+                this.copy(bestTeam);
+            }
         }
 
         public static boolean isInBlacklist(Pokemon poke) {
@@ -342,8 +357,8 @@ public class DreamTeam {
             return this.type1.nom() + "/" + this.type2.nom();
         }
 
-        public static boolean equals(Pokemon poke1, Pokemon poke2) {
-            if (poke1.type1.equals(poke2.type1) && poke1.type2.equals(poke2.type2)) {
+        public boolean equals(Pokemon poke) {
+            if (this.type1.equals(poke.type1) && this.type2.equals(poke.type2)) {
                 return true;
             }
             return false;
@@ -405,7 +420,7 @@ public class DreamTeam {
     }
 
     public static void parseEffectivities() throws ConfigurationException {
-        System.out.println("Parsing effectivities...");
+        System.out.print("Parsing effectivities... ");
         Configuration config = new PropertiesConfiguration("effect.properties");
         ImmutableMap.Builder<Type,ImmutableList<Integer>> builder = new ImmutableMap.Builder<Type,ImmutableList<Integer>>();
         
@@ -421,7 +436,7 @@ public class DreamTeam {
         }
 
         effect = builder.build();
-        System.out.println("Effivities parsed!");
+        System.out.println("OK");
     }
 
     public static ImmutableList<Integer> parseEffectivity(Configuration config, String key) {
@@ -439,7 +454,7 @@ public class DreamTeam {
 
 
     public static void parseTypes() throws ConfigurationException {
-        System.out.println("Parsing types...");
+        System.out.print("Parsing types... ");
         Configuration config = new PropertiesConfiguration("types.properties");
 
         ImmutableList.Builder<Pokemon> builder = new ImmutableList.Builder<Pokemon>(); 
@@ -456,7 +471,7 @@ public class DreamTeam {
             }
         }
         pokemons = builder.build();
-        System.out.println("Types parsed!");
+        System.out.println("OK");
     }
 
     public static List<Pokemon> parseType(Configuration config, String key1, Type type1) {
