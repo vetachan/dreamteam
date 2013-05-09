@@ -14,7 +14,7 @@ Dream Team
 
 1. Go to **Window > Open Perspective > Other** and open the *Git Repository Exploring* perspective.
 
-2. Click on clone a repository from GitHub and search for "dreamteam". Select "vetachan/dreamteam" once it is listed.
+2. Click on *Clone a Repository*, select *GitHub* and search for "dreamteam". Select "vetachan/dreamteam" once it is listed.
 
 3. Right click on the new repository and select *Import project* as a *General Project*.
 
