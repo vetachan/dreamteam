@@ -6,9 +6,9 @@ Dream Team
 1. Download and install [Eclipse for Java EE Developers](http://www.eclipse.org/downloads/)
 
 2. Open Eclipse and go to **Help > Install New Software** and add the following locations:
-  * http://dist.springsource.com/release/TOOLS/gradle and install Gradle IDE and Eclipse Integration Commons.
-  * http://download.eclipse.org/egit/updates only in case EGit is not installed (should be).
-  * http://download.eclipse.org/egit/github/updates and install Eclipse EGit Mylyn GitHub Feature.
+  * http://dist.springsource.com/release/TOOLS/gradle and install *Gradle IDE* and *Eclipse Integration Commons*.
+  * http://download.eclipse.org/egit/updates only in case *EGit* is not installed (should be).
+  * http://download.eclipse.org/egit/github/updates and install *Eclipse EGit Mylyn GitHub Feature*.
 
 #### Import project from GitHub
 
