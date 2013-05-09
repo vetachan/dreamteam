@@ -1,26 +1,31 @@
 Dream Team
 ==========
 
-- Download and install Eclipse for Java EE Developers (http://www.eclipse.org/downloads/)
+#### Install Eclipse and plugins for GitHub and Gradle
 
-- Open Eclipse and go to Help > Install New Software and add the following locations:
+1. Download and install [Eclipse for Java EE Developers](http://www.eclipse.org/downloads/)
 
-- http://dist.springsource.com/release/TOOLS/gradle and install Gradle IDE and Eclipse Integration Commons.
-- http://download.eclipse.org/egit/updates only in case EGit is not installed (should be).
-- http://download.eclipse.org/egit/github/updates and install Eclipse EGit Mylyn GitHub Feature.
+2. Open Eclipse and go to Help > Install New Software and add the following locations:
+  * http://dist.springsource.com/release/TOOLS/gradle and install Gradle IDE and Eclipse Integration Commons.
+  * http://download.eclipse.org/egit/updates only in case EGit is not installed (should be).
+  * http://download.eclipse.org/egit/github/updates and install Eclipse EGit Mylyn GitHub Feature.
 
-- Go to Window > Open Perspective > Other and open the Git Repository Exploring perspective.
+#### Import project from GitHub
 
-- Click on clone a repository from GitHub and search for "dreamteam". Select "vetachan/dreamteam" once it is listed.
+1. Go to Window > Open Perspective > Other and open the Git Repository Exploring perspective.
 
-- Right click on the new repository and select Import project as a General Project.
+2. Click on clone a repository from GitHub and search for "dreamteam". Select "vetachan/dreamteam" once it is listed.
 
-- Go now to Window > Open Perspective > Other and select the Java perspective.
+3. Right click on the new repository and select Import project as a General Project.
 
-- Right click on the new project and go to Configure > Convert to Gradle Project.
+#### Configure and execute the project
 
-- Now click on Run and select Gradle Build.
+1. Go now to Window > Open Perspective > Other and select the Java perspective.
 
-- A new window will appear to configure the tasks to be executed. Select only the task "run" and click on Run.
+2. Right click on the new project and go to Configure > Convert to Gradle Project.
+
+3. Now click on Run and select Gradle Build.
+
+4. A new window will appear to configure the tasks to be executed. Select only the task "run" and click on Run.
 
 That's all!
