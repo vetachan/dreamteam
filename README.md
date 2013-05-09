@@ -28,4 +28,4 @@ Dream Team
 
 4. A new window will appear to configure the tasks to be executed. Select only the task "run" and click on *Run*.
 
-That's all!
+That's all and good luck with your team! :)
