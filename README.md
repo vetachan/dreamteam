@@ -24,8 +24,10 @@ Dream Team
 
 2. Right click on the new project and go to **Configure > Convert to Gradle Project**.
 
-3. Now click on *Run* and select *Gradle Build*.
+3. Now click on *Run* and select *Gradle Build*. 
 
 4. A new window will appear to configure the tasks to be executed. Select only the task "run" and click on *Run*.
+  * If JDK is not installed this step will fail. In order to fix it, download and install *[Java Platform (JDK)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)*.
+
 
 That's all and good luck with your team! :)
