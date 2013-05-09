@@ -1,6 +1,5 @@
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,8 +25,8 @@ public class DreamTeam {
             parseTypes();
 
             Team team = new Team();
-            team.add(1, new Pokemon(Type.POISON, Type.GROUND));
-            team.add(2, new Pokemon(Type.DARK, Type.ICE));
+            team.add(1, new Pokemon(Type.FLYING, Type.WATER));
+            team.add(2, new Pokemon(Type.GHOST, Type.FLYING));
             //team.add(3, new Pokemon(Type.FIRE));
             //team.add(4, new Pokemon(Type.FIGHTING, Type.WATER));
             //team.add(5, new Pokemon(Type.DRAGON, Type.GROUND));
@@ -36,9 +35,9 @@ public class DreamTeam {
             //team.analize();
             //team.analizeOutcome();
             
-            team.generateTeams();
+            //team.generateTeams();
 
-            //team.optimize();
+            team.optimize();
                   
         } catch (ConfigurationException ce) {
             System.err.println("Could not open a configuration file");
@@ -281,6 +280,7 @@ public class DreamTeam {
             // TODO Read from file
             if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.DRAGON)) return true;
             if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.GROUND)) return true;
+            if (poke.type1.equals(Type.GHOST) && poke.type2.equals(Type.ELECTRIC)) return true;
             return false;
         }
 
