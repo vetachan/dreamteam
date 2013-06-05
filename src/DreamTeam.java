@@ -25,15 +25,15 @@ public class DreamTeam {
             parseTypes();
 
             Team team = new Team();
-            team.add(1, new Pokemon(Type.ELECTRIC));
-            team.add(2, new Pokemon(Type.DRAGON, Type.GROUND));
-            team.add(3, new Pokemon(Type.FLYING, Type.WATER));
+            team.add(1, new Pokemon(Type.DRAGON, Type.GROUND));
+            team.add(2, new Pokemon(Type.FLYING, Type.WATER));
+            //team.add(3, new Pokemon(Type.ELECTRIC));
             //team.add(4, new Pokemon(Type.FLYING, Type.WATER));
             //team.add(5, new Pokemon(Type.DRAGON, Type.GROUND));
             //team.add(6, new Pokemon(Type.ELECTRIC));
             
-            team.analize();
-            team.analizeOutcome();
+            //team.analize();
+            //team.analizeOutcome();
         
             team.generateTeams();
 
@@ -115,6 +115,16 @@ public class DreamTeam {
             for (Map.Entry<Type,Map<Type,Result>> entry : results.entrySet()) {
                 for (Map.Entry<Type,Result> result : entry.getValue().entrySet()) {
                     score += result.getValue().outcome.value();
+                    if (result.getValue().amount > 1) {
+                        switch (result.getValue().outcome) {                   
+                            case GOOD:                           
+                                score += 1; 
+                                break;
+                            case AMAZING:
+                                score += 2; 
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -128,6 +138,7 @@ public class DreamTeam {
                     Type type1 = entry.getKey();
                     Type type2 = result.getKey();
                     String types = type1.nom() + "/" + type2.nom();
+                    int amount = result.getValue().amount;
                     switch (result.getValue().outcome) {
                         case BAD: 
                             System.out.println("ALERT!!! Weakness against " + types);
@@ -139,10 +150,12 @@ public class DreamTeam {
                             System.out.println("Uhmm... Fair against " + types); 
                             break;
                         case GOOD:                            
-                            System.out.println("Easy as a pie with " + types);
+                            System.out.println("Easy as a pie with " + types + " (" + amount + ")");
                             break;
                         case AMAZING:
-                        //    System.out.println("Amazing against " + types + "!");
+                            if (amount < 2) {
+                                System.out.println("Amazing against " + types + "! (" + amount + ")");
+                            }
                             break;
                         default:
                             System.out.println("Unknown against " + types);
@@ -309,14 +322,14 @@ public class DreamTeam {
 
         public void analize(Map<Type,Map<Type,Result>> results) {
             Result bestResult;
-            Result result;
+            Outcome result;
             for (Pokemon foe : pokemons) {
                 bestResult = results.get(foe.type1).get(foe.type2);
-                if (bestResult.outcome.value() < Outcome.AMAZING.value()) {
-                    result = new Result(this.analizeBattle(foe), 0);
-                    if (bestResult.outcome.value() < result.outcome.value()) {
-                        results.get(foe.type1).put(foe.type2, result);
-                    }
+                result = this.analizeBattle(foe);
+                if (bestResult.outcome.value() < result.value()) {
+                    results.get(foe.type1).put(foe.type2, new Result(result, 1));
+                } else if (bestResult.outcome.value() == result.value()) {
+                    results.get(foe.type1).get(foe.type2).increase();
                 }
             }
         }
@@ -390,11 +403,11 @@ public class DreamTeam {
     }
 
     public enum Outcome {
-        AMAZING (4),
-        GOOD    (3),
-        FAIR    (2),
-        EVEN    (1),
-        BAD     (0);
+        AMAZING (8),
+        GOOD    (4),
+        FAIR    (1),
+        EVEN    (0),
+        BAD     (-10);
 
         private final int value;
         Outcome(int value) {
