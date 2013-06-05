@@ -16,7 +16,7 @@ public class DreamTeam {
 
     public static ImmutableMap<Type,ImmutableList<Integer>> effect;	
     public static ImmutableMap<Type,ImmutableList<Type>> types;
-    public static Map<Type,Map<Type,Outcome>> initialResult; 
+    public static Map<Type,Map<Type,Result>> initialResult; 
     public static ImmutableList<Pokemon> pokemons;
 
     public static void main(String[] args) {
@@ -25,19 +25,19 @@ public class DreamTeam {
             parseTypes();
 
             Team team = new Team();
-            team.add(1, new Pokemon(Type.FLYING, Type.WATER));
-            team.add(2, new Pokemon(Type.GHOST, Type.FLYING));
-            //team.add(3, new Pokemon(Type.FIRE));
-            //team.add(4, new Pokemon(Type.FIGHTING, Type.WATER));
+            team.add(1, new Pokemon(Type.ELECTRIC));
+            team.add(2, new Pokemon(Type.DRAGON, Type.GROUND));
+            team.add(3, new Pokemon(Type.FLYING, Type.WATER));
+            //team.add(4, new Pokemon(Type.FLYING, Type.WATER));
             //team.add(5, new Pokemon(Type.DRAGON, Type.GROUND));
             //team.add(6, new Pokemon(Type.ELECTRIC));
             
-            //team.analize();
-            //team.analizeOutcome();
-            
-            //team.generateTeams();
+            team.analize();
+            team.analizeOutcome();
+        
+            team.generateTeams();
 
-            team.optimize();
+            //team.optimize();
                   
         } catch (ConfigurationException ce) {
             System.err.println("Could not open a configuration file");
@@ -50,7 +50,7 @@ public class DreamTeam {
 
     public static class Team {
         List<Pokemon> members;
-        Map<Type,Map<Type,Outcome>> results;
+        Map<Type,Map<Type,Result>> results;
         int score;
 
         public Team() {
@@ -61,18 +61,18 @@ public class DreamTeam {
         public Team(Team team) {
             this.members = new ArrayList<Pokemon>(team.members);
             this.score = team.score;
-            this.results = new HashMap<Type,Map<Type,Outcome>>();
+            this.results = new HashMap<Type,Map<Type,Result>>();
             for (Type key : team.results.keySet()) {
-                this.results.put(key, new HashMap<Type,Outcome>(team.results.get(key)));
+                this.results.put(key, new HashMap<Type,Result>(team.results.get(key)));
             }  
         }
 
         public void copy(Team team) {
             this.members = new ArrayList<Pokemon>(team.members);
             this.score = team.score;
-            this.results = new HashMap<Type,Map<Type,Outcome>>();
+            this.results = new HashMap<Type,Map<Type,Result>>();
             for (Type key : team.results.keySet()) {
-                this.results.put(key, new HashMap<Type,Outcome>(team.results.get(key)));
+                this.results.put(key, new HashMap<Type,Result>(team.results.get(key)));
             }  
         }
 
@@ -86,9 +86,9 @@ public class DreamTeam {
 
         public void clearResults() {
             score = 0;
-            results = new HashMap<Type,Map<Type,Outcome>>();
+            results = new HashMap<Type,Map<Type,Result>>();
             for (Type key : initialResult.keySet()) {
-                results.put(key, new HashMap<Type,Outcome>(initialResult.get(key)));
+                results.put(key, new HashMap<Type,Result>(initialResult.get(key)));
             }    
         }
 
@@ -112,9 +112,9 @@ public class DreamTeam {
 
         public void analizeScore() {
             score = 0;
-            for (Map.Entry<Type,Map<Type,Outcome>> entry : results.entrySet()) {
-                for (Map.Entry<Type,Outcome> outcome : entry.getValue().entrySet()) {
-                    score += outcome.getValue().value();
+            for (Map.Entry<Type,Map<Type,Result>> entry : results.entrySet()) {
+                for (Map.Entry<Type,Result> result : entry.getValue().entrySet()) {
+                    score += result.getValue().outcome.value();
                 }
             }
         }
@@ -122,13 +122,13 @@ public class DreamTeam {
         public void analizeOutcome() {
             System.out.println(members);
             score = 0;
-            for (Map.Entry<Type,Map<Type,Outcome>> entry : results.entrySet()) {
-                for (Map.Entry<Type,Outcome> outcome : entry.getValue().entrySet()) {
-                    score += outcome.getValue().value();
+            for (Map.Entry<Type,Map<Type,Result>> entry : results.entrySet()) {
+                for (Map.Entry<Type,Result> result : entry.getValue().entrySet()) {
+                    score += result.getValue().outcome.value();
                     Type type1 = entry.getKey();
-                    Type type2 = outcome.getKey();
+                    Type type2 = result.getKey();
                     String types = type1.nom() + "/" + type2.nom();
-                    switch (outcome.getValue()) {
+                    switch (result.getValue().outcome) {
                         case BAD: 
                             System.out.println("ALERT!!! Weakness against " + types);
                             break;
@@ -142,7 +142,7 @@ public class DreamTeam {
                             System.out.println("Easy as a pie with " + types);
                             break;
                         case AMAZING:
-                            System.out.println("Amazing against " + types + "!");
+                        //    System.out.println("Amazing against " + types + "!");
                             break;
                         default:
                             System.out.println("Unknown against " + types);
@@ -278,9 +278,10 @@ public class DreamTeam {
 
         public static boolean isInBlacklist(Pokemon poke) {
             // TODO Read from file
-            if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.DRAGON)) return true;
-            if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.GROUND)) return true;
-            if (poke.type1.equals(Type.GHOST) && poke.type2.equals(Type.ELECTRIC)) return true;
+            //if (poke.type1.equals(Type.ELECTRIC) && poke.type2.equals(Type.FLYING)) return true;
+            //if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.DRAGON)) return true;
+            //if (poke.type1.equals(Type.DRAGON) && poke.type2.equals(Type.GROUND)) return true;
+            //if (poke.type1.equals(Type.GHOST) && poke.type2.equals(Type.ELECTRIC)) return true;
             return false;
         }
 
@@ -306,15 +307,15 @@ public class DreamTeam {
             this.single = type1.equals(type2);
         }
 
-        public void analize(Map<Type,Map<Type,Outcome>> results) {
-            Outcome bestOutcome;
-            Outcome outcome;
+        public void analize(Map<Type,Map<Type,Result>> results) {
+            Result bestResult;
+            Result result;
             for (Pokemon foe : pokemons) {
-                bestOutcome = results.get(foe.type1).get(foe.type2);
-                if (bestOutcome.value() < Outcome.AMAZING.value()) {
-                    outcome = this.analizeBattle(foe);
-                    if (bestOutcome.value() < outcome.value()) {
-                        results.get(foe.type1).put(foe.type2, outcome);
+                bestResult = results.get(foe.type1).get(foe.type2);
+                if (bestResult.outcome.value() < Outcome.AMAZING.value()) {
+                    result = new Result(this.analizeBattle(foe), 0);
+                    if (bestResult.outcome.value() < result.outcome.value()) {
+                        results.get(foe.type1).put(foe.type2, result);
                     }
                 }
             }
@@ -362,6 +363,29 @@ public class DreamTeam {
                 return true;
             }
             return false;
+        }
+    }
+
+    public static class Result {
+        public Outcome outcome;
+        public int amount;
+
+        public Result(Outcome outcome, int amount) {
+            this.outcome = outcome;
+            this.amount = amount;
+        }
+
+        public Result(Result result) {
+            this.outcome = result.outcome;
+            this.amount = result.amount;
+        }
+
+        public void increase() {
+            this.amount++;
+        }
+
+        public String toString() {
+            return this.outcome.value() + ":" + this.amount;
         }
     }
 
@@ -458,7 +482,7 @@ public class DreamTeam {
         Configuration config = new PropertiesConfiguration("types.properties");
 
         ImmutableList.Builder<Pokemon> builder = new ImmutableList.Builder<Pokemon>(); 
-        initialResult = new HashMap<Type,Map<Type,Outcome>>();
+        initialResult = new HashMap<Type,Map<Type,Result>>();
 
         Iterator it = config.getKeys();
         while (it.hasNext()) {
@@ -476,7 +500,7 @@ public class DreamTeam {
 
     public static List<Pokemon> parseType(Configuration config, String key1, Type type1) {
         List<Pokemon> pokes = new ArrayList<Pokemon>();
-        Map<Type,Outcome> resultMap = new HashMap<Type,Outcome>();    
+        Map<Type,Result> resultMap = new HashMap<Type,Result>();    
         
         for (Object o : config.getList(key1)) {
             String key2 = o.toString();
@@ -485,7 +509,7 @@ public class DreamTeam {
                 if (initialResult != null && initialResult.containsKey(type2)
                     && initialResult.get(type2).containsKey(type1)) continue;
                 pokes.add(new Pokemon(type1, type2));
-                resultMap.put(type2, Outcome.BAD);
+                resultMap.put(type2, new Result(Outcome.BAD, 0));
             } catch (IllegalArgumentException iae) {
                 System.err.println("Ignoring missing type " + key2);
             }
